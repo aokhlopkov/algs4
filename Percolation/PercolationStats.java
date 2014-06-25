@@ -4,7 +4,7 @@ public class PercolationStats {
 // perform T independent computational experiments on an N-by-N grid
     public PercolationStats(int N, int T) {
         if (N <= 0 || T <= 0) throw new IllegalArgumentException();
-        double[] fractions = new double[N];
+        fractions = new double[T];
         for (int k = 0; k < T; k++) {
             Percolation p = new Percolation(N);
             int count = 0;
@@ -15,45 +15,51 @@ public class PercolationStats {
                 p.open(i, j);
                 count++;
             }
-            fractions[k] = (double)count / (N * N);    
-        }
-        
-        
+            fractions[k] = (double) count / (N * N);    
+        }       
     }
     
     // sample mean of percolation threshold
     public double mean() {
-        double result = 0;
-        for (double f: fractions) {
-            result += f;
-        }
-        return result / fractions.length;
+        return StdStats.mean(fractions);
     }
     
     // sample standard deviation of percolation threshold
     public double stddev() {
-        int N = fractions.length;
-        if (N == 1) return Double.NaN;
-        double m = mean();
-        double result = 0;
-        for (double f: fractions) {
-            result += (f - m) * (f - m);
-        }
-        return Math.sqrt(result / (N - 1));
+        return StdStats.stddev(fractions);
     }
     
     // returns lower bound of the 95% confidence interval
     public double confidenceLo() {
-        return 0.0; 
+        double m = mean();
+        double s = stddev();
+        return m - 1.96 * s / Math.sqrt(fractions.length);
     }
     
     // returns upper bound of the 95% confidence interval
     public double confidenceHi() {
-        return 0.0;
+        double m = mean();
+        double s = stddev();
+        return m + 1.96 * s / Math.sqrt(fractions.length);
     }
     
     // test client, described below
     public static void main(String[] args)   {
+        if (args.length != 2) {
+            StdOut.println("Wrong parameters, expected N T");
+            return;
+        }
+        int N = Integer.parseInt(args[0]);
+        int T = Integer.parseInt(args[1]);
+        PercolationStats stats = new PercolationStats(N, T);
+        StdOut.print("mean                    = ");
+        StdOut.println(stats.mean());
+        StdOut.print("stddev                  = ");
+        StdOut.println(stats.stddev());
+        StdOut.print("95% confidence interval = ");
+        StdOut.print(stats.confidenceLo());
+        StdOut.print(", ");
+        StdOut.println(stats.confidenceHi());
     }
         
 }
