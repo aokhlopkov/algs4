@@ -75,8 +75,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         }                                                 
         int index = StdRandom.uniform(size);
         Item t = items[index];
-        items[index] = items[size - 1];
         size--;
+        items[index] = items[size];
+        items[size] = null;
+        
         if (size == items.length / 4 && size != 0) {
             Item[] newItems = (Item[]) new Object[size * 2];
             for (int i = 0; i < size; i++) {
@@ -113,8 +115,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         q.enqueue(7);
         q.enqueue(8);
         q.enqueue(9);
-        Iterator<Integer> iterator1 = q.iterator();
-        Iterator<Integer> iterator2 = q.iterator();
         for (int i1: q) {
             for (int i2: q) {
                 StdOut.print(i1);
